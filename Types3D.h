@@ -41,3 +41,14 @@ public:
 private:
 	double _mag;
 };
+
+
+class Matrix {
+public:
+	Matrix(double* mat) : _m(mat) {};
+	~Matrix() { delete[] _m };
+
+	Vector left_transform(Vector& const v) { return Vector(_m[0] * v.x + _m[1] * v.y + _m[2] * v.z, _m[3] * v.x + _m[4] * v.y + _m[5] * v.z, _m[6] * v.x + _m[7] * v.y + _m[8] * v.z); };
+private:
+	double* _m;
+};

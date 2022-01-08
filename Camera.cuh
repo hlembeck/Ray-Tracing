@@ -26,7 +26,7 @@ public:
 	~PinholeCamera() {};
 
 	__host__ void _fillRays(Ray* rays, const unsigned int x, const unsigned int y);
-	PiecewiseSpectrum* takePicture(double exposure, Scene& scene);
+	PiecewiseSpectrum* takePicture(Scene& scene);
 private:
 	Sensor _sensor;
 	Point _pinhole;

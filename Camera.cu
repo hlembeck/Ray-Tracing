@@ -32,7 +32,7 @@ __global__ void TraceRay(Ray* rays, Scene& scene, PiecewiseSpectrum* spectrums, 
 	fin:
 }
 
-PiecewiseSpectrum* PinholeCamera::takePicture(double exposure, Scene& scene) {
+PiecewiseSpectrum* PinholeCamera::takePicture(Scene& scene) {
 	const unsigned int spectrumSize = sizeof(PiecewiseSpectrum) * raysPerPixel * raysPerPixel * reflectionsPerRay;
 	const unsigned int angleSize = sizeof(double) * raysPerPixel * raysPerPixel *  reflectionsPerRay;
 
@@ -51,8 +51,7 @@ PiecewiseSpectrum* PinholeCamera::takePicture(double exposure, Scene& scene) {
 			for (unsigned int k = 0; k < reflectionsPerRay; k++) {
 				TraceRay << <1, dim3(raysPerPixel, raysPerPixel) >> > (rays, scene, &spectrums[k*raysPerPixel], &angles[raysPerPixel]);
 			}
-
-
+			_sensor._computePixel(spectrums, angles, i * _sensor._pWidth + j);
 		}
 	}
 }
