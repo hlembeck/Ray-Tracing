@@ -2,6 +2,7 @@
 
 Face::Face(Point p1, Point p2, Point p3) : _p1(p1), _p2(p2), _p3(p3), _spectrum() {
 	_orientation = Vector(p2 - p1).cross(Vector(p3 - p2));
+	_orientation.normalize();
 }
 
 bool Face::onPlane(Point p) {
@@ -60,4 +61,17 @@ __device__ double Mesh::getIntersection(Ray r) {
 			return intersection;
 	}
 	return -1.0;
+}
+
+__device__ bool Mesh::handleIntersection(Ray& r, PiecewiseSpectrum& s, double& angle) {
+	double intersection;
+	for (unsigned int i = 0; i < _numFaces; i++) {
+		if ((intersection = _faces[i].getIntersection(r.direction, r.origin)) > 0) {
+			s = _faces[i]._spectrum;
+			angle = r.direction.dot(_faces[i]._orientation);
+			r.origin = r.origin.translate(r.direction,intersection);
+			r.direction = r.direction - _faces[i]._orientation.scale(2 * (r.direction.dot(_faces[i]._orientation)));
+		}
+	}
+	return false;
 }

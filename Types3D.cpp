@@ -37,8 +37,16 @@ double Vector::mag() {
 	return _mag;
 }
 
-Vector Vector::operator+(Vector v) {
+Vector Vector::operator+(const Vector& v) {
 	return Vector(x + v.x, y + v.y, z + v.z);
+}
+
+Vector Vector::operator-(const Vector& v) {
+	return Vector(x - v.x, y - v.y, z - v.z);
+}
+
+Vector Vector::scale(const double t) {
+	return Vector(x * t, y * t, z * t);
 }
 
 void Vector::print() {

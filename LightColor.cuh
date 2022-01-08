@@ -7,16 +7,21 @@
 //in nm
 constexpr unsigned short MIN_WAVELENGTH = 350;
 constexpr unsigned short MAX_WAVELENGTH = 750;
+constexpr unsigned char STEP_LENGTH = 10;
+constexpr unsigned short STEPS = 40;
 
 //Describes a spectrum that is piecewise constant with (MAX_WAVELENGTH-MIN_WAVELENGTH)/_step pieces. Each piece i emits power _power[i].
 class PiecewiseSpectrum {
 public:
-	PiecewiseSpectrum() : _step(MAX_WAVELENGTH - MIN_WAVELENGTH), _power(new double[1]{ 0 }) {};
-	PiecewiseSpectrum(unsigned char s, double* p) : _step(s), _power(p) { (MAX_WAVELENGTH - MIN_WAVELENGTH) % s ? throw : 0; };
+	PiecewiseSpectrum() : _power(new double[STEPS]{ 0 }) {};
+	PiecewiseSpectrum(double* p) : _power(p) { };
 	~PiecewiseSpectrum() { delete[] _power; };
 
+	double* getPower() const { return _power; };
+	void add(PiecewiseSpectrum& const s) { for (unsigned int i = 0; i < STEPS; i++) { _power[i] = _power[i] + s.getPower()[i] }  };
+	void scale(double angle) { for (unsigned int i = 0; i < STEPS; i++) { _power[i] = _power[i] * angle; } };
 private:
-	unsigned short _step;
+	//note: angle is cosine of angle, not angle itself.
 	double* _power;
 };
 
@@ -40,5 +45,4 @@ struct RefractiveIndex {
 __device__ struct Ray {
 	Point origin;
 	Vector direction;
-	PiecewiseSpectrum spectrum;
 };

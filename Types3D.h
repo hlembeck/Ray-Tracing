@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdio.h>
+#include <utility>
 #pragma once
 
 class Vector;
@@ -29,7 +30,9 @@ public:
 	double y;
 	double z;
 
-	Vector operator+ (Vector v);
+	Vector operator+ (const Vector& v);
+	Vector operator- (const Vector& v);
+	Vector scale(const double t);
 	void normalize();
 	Vector cross(Vector v);
 	double dot(Vector v);

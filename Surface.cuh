@@ -30,6 +30,7 @@ private:
 };
 
 class Face {
+	friend class Mesh;
 public:
 	Face(Point p1, Point p2, Point p3);
 	Face(Point p1, Point p2, Point p3, PiecewiseSpectrum s) : _p1(p1), _p2(p2), _p3(p3), _spectrum(s) {};
@@ -39,8 +40,6 @@ public:
 	bool inTriangle(Point p);
 	//Returns t s.t p+vt lies on face, otherwise returns -1.0
 	__device__ double getIntersection(Vector v, Point p);
-
-	__device__ bool testFace(Ray& ray, unsigned int i, PiecewiseSpectrum& s, double& angle);
 protected:
 	Point _p1;
 	Point _p2;
@@ -56,6 +55,9 @@ public:
 	~Mesh() { };
 
 	__device__ double getIntersection(Ray r);
+
+	//Given ray r, returns true iff r intersects the mesh at some face. In this case, r is set to the reflected ray, s is set to the spectrum of the face, and angle is set to the angle of incidence of the intersection. 
+	__device__ bool handleIntersection(Ray& r, PiecewiseSpectrum& s, double& angle);
 private:
 	Face* _faces;
 	unsigned int _numFaces;
