@@ -1,5 +1,12 @@
 #include "LightColor.cuh"
 
+void printArray(double* const arr, unsigned int const len) {
+	for (unsigned int i = 0; i < len - 1; i++) {
+		printf("%f, ", arr[i]);
+	}
+	printf("%f\n", arr[len - 1]);
+}
+
 //x: wavelength (nm)
 double redSpectrum(double x) {
 	return .25 * exp(.5 * (x - 620) * (x - 620) / 900.0);
@@ -25,7 +32,7 @@ double colorMatch_Z(double l) {
 	return 1.217 * piecewiseGaussian(l, 437.0, 11.8, 36.0) + .681 * piecewiseGaussian(l, 459.0, 26.0, 13.8);
 }
 
-RGBa* XYZ::toRGB() {
+RGBa XYZ::toRGB() {
 	double* mat = new double[9];
 
 	mat[0] = fg_RiemannSum(MIN_WAVELENGTH, MAX_WAVELENGTH, 1, &redSpectrum, &colorMatch_X);
@@ -41,8 +48,9 @@ RGBa* XYZ::toRGB() {
 	mat[8] = fg_RiemannSum(MIN_WAVELENGTH, MAX_WAVELENGTH, 1, &blueSpectrum, &colorMatch_Z);
 
 	Matrix m(mat);
-	Vector rgb = m.left_transform(Vector(_X, _Y, _Z));
-	return new RGBa(rgb.x, rgb.y, rgb.z, 255);
+	Vector v(_X, _Y, _Z);
+	Vector rgb = m.left_transform(v);
+	return RGBa(rgb.x, rgb.y, rgb.z, 255);
 }
 
 XYZ PiecewiseSpectrum::toXYZ() {
@@ -64,4 +72,66 @@ XYZ PiecewiseSpectrum::toXYZ() {
 	z = rSum(MIN_WAVELENGTH, MAX_WAVELENGTH, STEP_LENGTH, tVals);
 
 	return XYZ(x, y, z);
+}
+
+void printRays(Ray* rays, unsigned int w, unsigned int h) {
+	printf("Origins:\n");
+	for (unsigned int i = 0; i < h; i++) {
+		for (unsigned int j = 0; j < w; j++) {
+			rays[i * w + j].origin.print();
+			printf(" ");
+		}
+		printf("\n");
+	}
+	printf("Directions:\n");
+	for (unsigned int i = 0; i < h; i++) {
+		for (unsigned int j = 0; j < w; j++) {
+			rays[i * w + j].direction.print();
+			printf(" ");
+		}
+		printf("\n");
+	}
+}
+
+XYZ* getXYZ(PiecewiseSpectrum* s, unsigned int l) {
+	XYZ* xyz = new XYZ[l];
+	for (unsigned int i = 0; i < l; i++) {
+		xyz[i] = s[i].toXYZ();
+	}
+	return xyz;
+}
+
+RGBa* getRGB(XYZ* xyz, unsigned int l) {
+	RGBa* rgb = new RGBa[l];
+	for (unsigned int i = 0; i < l; i++) {
+		rgb[i] = xyz[i].toRGB();
+	}
+	return rgb;
+}
+
+RGBa* develop(PiecewiseSpectrum* s, unsigned int l) {
+	if (l == 0)
+		return NULL;
+	RGBa* rgb = new RGBa[l];
+	XYZ* xyz = new XYZ[l];
+	xyz[0] = s[0].toXYZ();
+	for (unsigned int i = 1; i < l; i++) {
+		xyz[i] = s[i].toXYZ();
+		rgb[i - 1] = xyz[i - 1].toRGB();
+	}
+	rgb[l - 1] = xyz[l - 1].toRGB();
+	return rgb;
+}
+
+const PiecewiseSpectrum sun() {
+	double* vals;
+	cudaMallocManaged((void**)&vals, sizeof(double) * STEPS);
+	int peak = STEPS / 3;
+	for (int i = 0; i < peak; i++) {
+		vals[i] = 1.5 + 0.25 * (i / (double)peak);
+	}
+	for (int i = 0; i < STEPS-peak; i++) {
+		vals[i+peak] = 1.75 - 0.35 * (i / (double)(STEPS-peak));
+	}
+	return PiecewiseSpectrum(vals);
 }

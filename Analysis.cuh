@@ -1,5 +1,4 @@
-#include "Types3D.h"
-#pragma once
+#include "Types3D.cuh"
 
 double piecewiseGaussian(double x, double m, double s, double t);
 

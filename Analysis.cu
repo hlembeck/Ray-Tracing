@@ -1,4 +1,4 @@
-#include "Analysis.h"
+#include "Analysis.cuh"
 
 double piecewiseGaussian(double x, double m, double s, double t) {
 	double v = -.5 * (x - m) * (x - m);

@@ -77,21 +77,31 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <CudaCompile Include="Analysis.cu" />
     <CudaCompile Include="Camera.cu" />
     <CudaCompile Include="LightColor.cu" />
     <CudaCompile Include="main.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Analysis.h" />
-    <ClInclude Include="Camera.cuh" />
-    <ClInclude Include="LightColor.cuh" />
-    <ClInclude Include="Surface.cuh" />
-    <ClInclude Include="Types3D.h" />
+    <CudaCompile Include="Surface.cu" />
+    <CudaCompile Include="Types3D.cuh" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Analysis.cpp" />
-    <ClCompile Include="Surface.cu" />
-    <ClCompile Include="Types3D.cpp" />
+    <CudaCompile Include="Types3D.cu">
+      <FileType>CppCode</FileType>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="Analysis.cuh" />
+    <CudaCompile Include="Camera.cuh" />
+    <CudaCompile Include="LightColor.cuh" />
+    <CudaCompile Include="Surface.cuh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lodepng.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lodepng.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
